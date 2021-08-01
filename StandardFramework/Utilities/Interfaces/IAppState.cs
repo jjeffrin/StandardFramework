@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StandardFramework.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -11,5 +12,6 @@ namespace StandardFramework.Utilities.Interfaces
         void NotifyAppStateChange();
         bool IsAppLoading();
         void ToggleAppLoadState(bool? state = null);
+        IEnumerable<NotificationModel> LocalNotifications { get; set; }
     }
 }

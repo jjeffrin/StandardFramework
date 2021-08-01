@@ -36,11 +36,15 @@ namespace StandardFramework
 
             // -- FRAMEWORK SERVICES --
             services.AddMudServices();
-            services.AddDbContextFactory<AppDbContext>(options =>
+            services.AddDbContextPool<AppDbContext>(options =>
             {
                 options.UseSqlServer(this.Configuration.GetConnectionString("Local"));
             });
-            services.AddSingleton<IAppState, AppState>();
+            services.AddScoped<IAppState, AppState>();
+            services.AddScoped<IAppConfig, AppConfig>();
+            services.AddScoped<IAppMetrics, AppMetrics>();
+            // !!! ActionExecutor should be at the last !!! //
+            services.AddScoped<IActionExecutor, ActionExecutor>();
             // -- FRAMEWORK SERVICES --
         }
 
