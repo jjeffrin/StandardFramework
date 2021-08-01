@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using StandardFramework.Models;
 using StandardFramework.Models.Config;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ namespace StandardFramework.Services
 {
     public class AppDbContext : DbContext
     {
-        public AppDbContext(DbContextOptions options) : base(options)
+        public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
 
         }
@@ -18,6 +19,8 @@ namespace StandardFramework.Services
 
         public DbSet<UserConfigModel> UserConfigs { get; set; }
         public DbSet<GlobalConfigModel> GlobalConfigs { get; set; }
+        public DbSet<NotificationModel> Notifications { get; set; }
+        public DbSet<ScreenMetricModel> ScreenMetrics { get; set; }
 
         #endregion
     }

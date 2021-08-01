@@ -1,4 +1,5 @@
-﻿using StandardFramework.Utilities.Interfaces;
+﻿using StandardFramework.Models;
+using StandardFramework.Utilities.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,8 +10,13 @@ namespace StandardFramework.Utilities
     public class AppState : IAppState
     {
         private bool AppLoadingState { get; set; } = false;
+        public IEnumerable<NotificationModel> LocalNotifications { get; set; }
 
         public event Action OnAppStateChange;
+        public AppState()
+        {
+            this.LocalNotifications = new List<NotificationModel>();
+        }
 
         public bool IsAppLoading()
         {
