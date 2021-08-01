@@ -1,7 +1,9 @@
 ﻿@inherits LayoutComponentBase
+@inject IAppState AppState 
+@implements IDisposable
 
 <MudLayout>
-    <MudProgressLinear Color="Color.Secondary" Indeterminate="true" />
+    <MudProgressLinear Color="Color.Secondary" Indeterminate="AppState.IsAppLoading()" />
     <MudAppBar Class="mt-1" Elevation="1" Dense="true">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.False" OnClick="@ToggleDrawer" />
         <MudSpacer />
@@ -42,4 +44,15 @@
     {
         open = !open;
     }
+
+    protected override void OnInitialized()
+    {
+        AppState.OnAppStateChange += StateHasChanged;
+    }
+
+    public void Dispose()
+    {
+        AppState.OnAppStateChange -= StateHasChanged;
+    }
+
 } 
