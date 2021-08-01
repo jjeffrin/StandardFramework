@@ -7,6 +7,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MudBlazor.Services;
 using StandardFramework.Data;
+using StandardFramework.Utilities;
+using StandardFramework.Utilities.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,8 +31,11 @@ namespace StandardFramework
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+
+            // -- FRAMEWORK SERVICES --
             services.AddMudServices();
-            services.AddSingleton<WeatherForecastService>();
+            services.AddSingleton<IAppState, AppState>();
+            // -- FRAMEWORK SERVICES --
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
