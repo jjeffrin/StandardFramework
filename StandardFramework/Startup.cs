@@ -2,11 +2,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using MudBlazor.Services;
 using StandardFramework.Data;
+using StandardFramework.Services;
 using StandardFramework.Utilities;
 using StandardFramework.Utilities.Interfaces;
 using System;
@@ -34,6 +36,10 @@ namespace StandardFramework
 
             // -- FRAMEWORK SERVICES --
             services.AddMudServices();
+            services.AddDbContextFactory<AppDbContext>(options =>
+            {
+                options.UseSqlServer(this.Configuration.GetConnectionString("Local"));
+            });
             services.AddSingleton<IAppState, AppState>();
             // -- FRAMEWORK SERVICES --
         }
