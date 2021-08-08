@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using MudBlazor;
 using MudBlazor.Services;
 using StandardFramework.Data;
 using StandardFramework.Services;
@@ -35,7 +36,18 @@ namespace StandardFramework
             services.AddServerSideBlazor();
 
             // -- FRAMEWORK SERVICES --
-            services.AddMudServices();
+            services.AddMudServices((config) => 
+            {
+                config.SnackbarConfiguration.MaxDisplayedSnackbars = 10;
+                config.SnackbarConfiguration.PreventDuplicates = false;
+                config.SnackbarConfiguration.BackgroundBlurred = true;
+                config.SnackbarConfiguration.HideTransitionDuration = 500;
+                config.SnackbarConfiguration.ShowTransitionDuration = 500;
+                config.SnackbarConfiguration.VisibleStateDuration = 5;
+                config.SnackbarConfiguration.NewestOnTop = true;
+                config.SnackbarConfiguration.ShowCloseIcon = true;
+                config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;
+            });
             services.AddDbContextPool<AppDbContext>(options =>
             {
                 options.UseSqlServer(this.Configuration.GetConnectionString("Local"));

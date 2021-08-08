@@ -6,6 +6,9 @@
     <MudProgressLinear Color="Color.Secondary" Indeterminate="AppState.IsAppLoading()" />
     <MudAppBar Class="mt-1" Elevation="1" Dense="true">
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.False" OnClick="@ToggleDrawer" />
+        <h5 class="mud-typography mud-typography-h6 mud-inherit-text mudblazor-appbar-brand-text d-none d-md-flex">
+            Standard Framework
+        </h5>
         <MudSpacer />
         <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/Garderoben/MudBlazor" Target="_blank" />
     </MudAppBar>
@@ -15,12 +18,12 @@
                 <MudText Typo="Typo.h6" Class="px-4">Standard Framework</MudText>
                 <MudText Typo="Typo.body2" Class="px-4 mud-text-secondary">Alpha 0.1</MudText>
                 <MudDivider Class="my-2" />
+                <MudNavLink Href="/login" Disabled="true">Login</MudNavLink>
                 <MudNavLink Href="/dashboard">Dashboard</MudNavLink>
-                <MudNavLink Href="/servers">Servers</MudNavLink>
-                <MudNavLink Href="/billing" Disabled="true">Billing</MudNavLink>
-                <MudNavGroup Title="Settings" Expanded="true">
-                    <MudNavLink Href="/users">Users</MudNavLink>
-                    <MudNavLink Href="/security">Security</MudNavLink>
+                <MudNavLink Href="/metrics">Metrics</MudNavLink>
+                <MudNavGroup Title="Feature Flags" Expanded="false">
+                    <MudNavLink Href="/featureFlags/UserConfiguration">User Configuration</MudNavLink>
+                    <MudNavLink Href="/featureFlags/GlobalConfiguration">Global Configuration</MudNavLink>
                 </MudNavGroup>
                 <MudNavLink Href="/about">About</MudNavLink>
             </MudNavMenu>
