@@ -1,0 +1,18 @@
+﻿@inject ISnackbar Snackbar
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6">
+            <MudIcon Icon="@Icons.Material.Filled.Create" Class="mr-3 mb-n1" />
+            Add New User Config
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudTextField @bind-Value="@SelectedConfig.Name" Label="Config Name" />
+        <MudSwitch @bind-Checked="@SelectedConfig.State" Color="Color.Secondary" Label="Is Enabled ?" />
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Error" OnClick="ProcessUserConfig">@GetUpdateBtnText()</MudButton>
+    </DialogActions>
+</MudDialog>

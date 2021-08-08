@@ -1,4 +1,5 @@
-﻿using StandardFramework.Models;
+﻿using MudBlazor;
+using StandardFramework.Models;
 using StandardFramework.Services;
 using StandardFramework.Utilities.Interfaces;
 using System;
@@ -11,25 +12,36 @@ namespace StandardFramework.Utilities
     public class ActionExecutor : IActionExecutor
     {
         private readonly AppDbContext context;
+        private readonly ISnackbar snackbarService;
         private readonly IAppState appState;
         private readonly IAppConfig appConfig;
+
+        public enum ActionContextEnum
+        {
+            Update,
+            Insert,
+            Create,
+            Read,
+            Generic
+        }
 
         public Dictionary<string, bool> Configs { get; set; }
 
         // inject the app DB context via constructor injection
-        public ActionExecutor(IAppState appstate, IAppConfig appConfig, AppDbContext context)
+        public ActionExecutor(IAppState appstate, IAppConfig appConfig, AppDbContext context, ISnackbar snackbarService)
         {
             this.appState = appstate;
             this.appConfig = appConfig;
             this.context = context;
+            this.snackbarService = snackbarService;
         }
 
-        public async Task ExecuteAction(Action action)
+        public async Task ExecuteActionWithContext(Action<AppDbContext> action, ActionContextEnum actionContext = ActionContextEnum.Generic, bool showFeedback = false)
         {
             Exception exceptionInfo = null;
             try
             {
-                action?.Invoke();
+                action?.Invoke(this.context);
             }
             catch (Exception ex)
             {
@@ -39,6 +51,25 @@ namespace StandardFramework.Utilities
             {
                 await this.ProcessExecutionResult(exceptionInfo);
             }
+        }
+
+        public async Task ExecuteAction(Action<AppDbContext> action)
+        {
+            //this.appState.ToggleAppLoadState(true);
+            Exception exceptionInfo = null;
+            try
+            {
+                action?.Invoke(this.context);
+            }
+            catch (Exception ex)
+            {
+                exceptionInfo = ex;
+            }
+            finally
+            {
+                await this.ProcessExecutionResult(exceptionInfo);
+            }
+            //this.appState.ToggleAppLoadState(false);
         }
 
         private async Task ProcessExecutionResult(Exception exceptionInfo)
@@ -69,8 +100,12 @@ namespace StandardFramework.Utilities
                 }
             }
 
-            if (saveNotificationToDb) await this.context.SaveChangesAsync();
+            this.appState.SetDbBusy(true);
+            // if (saveNotificationToDb) await this.context.SaveChangesAsync();
             //this.appState.NotifyNotificationStateChanged();
+            await this.context.SaveChangesAsync();
+            this.snackbarService.Add("The action is completed. Time of completion: " + DateTime.Now.ToShortTimeString(), Severity.Success);
+            this.appState.SetDbBusy(false);
             this.appState.NotifyAppStateChange();
         }
     }

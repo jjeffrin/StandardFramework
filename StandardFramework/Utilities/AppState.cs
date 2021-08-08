@@ -10,6 +10,7 @@ namespace StandardFramework.Utilities
     public class AppState : IAppState
     {
         private bool AppLoadingState { get; set; } = false;
+        private bool DbBusy { get; set; } = false;
         public IEnumerable<NotificationModel> LocalNotifications { get; set; }
 
         public event Action OnAppStateChange;
@@ -39,6 +40,16 @@ namespace StandardFramework.Utilities
         public void NotifyAppStateChange()
         {
             OnAppStateChange?.Invoke();
+        }
+
+        public bool IsDbBusy()
+        {
+            return DbBusy;
+        }
+
+        public void SetDbBusy(bool state)
+        {
+            this.DbBusy = state;
         }
     }
 }

@@ -1,0 +1,49 @@
+﻿@page "/featureFlags/UserConfiguration"
+@inherits StandardScreenBase
+
+
+<MudText Typo="Typo.h6">User Configuration Settings</MudText>
+
+@if (this.UserConfigs == null)
+{
+    
+}
+@*else if (this.UserConfigs.Count() == 0)
+{
+    <MudText Typo="Typo.body2">No records found.</MudText>
+}*@
+else
+{
+    <MudSimpleTable Dense="false" Hover="true" Bordered="false" Striped="false" Style="overflow-x: auto;">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>State</th>
+                <th>Created Date</th>
+                <th>Updated Date</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var row in this.UserConfigs)
+            {
+                <tr>
+                    <td>@row.Name</td>
+                    <td>@row.State</td>
+                    <td>@row.CreateDate</td>
+                    <td>@row.UpdateDate</td>
+                    <td><MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" OnClick="() => { DeleteConfig(row.Name); }"></MudIconButton></td>
+                    <td><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="delete" OnClick="() => { OpenUpdateConfigModal(row); }"></MudIconButton></td>
+                </tr>
+            }
+        </tbody>
+    </MudSimpleTable>
+}
+
+<span class="mud-scroll-to-top visible" style="z-index:2000;" @onclick="OpenAddNewConfigModal">
+    <MudTooltip Text="Add">
+        <MudFab Icon="@Icons.Material.Filled.Add" Color="Color.Secondary" 
+        />
+    </MudTooltip>
+</span>

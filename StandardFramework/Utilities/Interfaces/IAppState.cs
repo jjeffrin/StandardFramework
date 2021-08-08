@@ -11,6 +11,8 @@ namespace StandardFramework.Utilities.Interfaces
         event Action OnAppStateChange;
         void NotifyAppStateChange();
         bool IsAppLoading();
+        bool IsDbBusy();
+        void SetDbBusy(bool state);
         void ToggleAppLoadState(bool? state = null);
         IEnumerable<NotificationModel> LocalNotifications { get; set; }
     }
