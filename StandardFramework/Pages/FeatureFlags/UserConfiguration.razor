@@ -33,7 +33,7 @@ else
                     <td>@row.State</td>
                     <td>@row.CreateDate</td>
                     <td>@row.UpdateDate</td>
-                    <td><MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" OnClick="() => { DeleteConfig(row.Name); }"></MudIconButton></td>
+                    <td><MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error" aria-label="delete" OnClick="async () => { await DeleteConfig(row.Name); }"></MudIconButton></td>
                     <td><MudIconButton Icon="@Icons.Material.Filled.Edit" aria-label="delete" OnClick="() => { OpenUpdateConfigModal(row); }"></MudIconButton></td>
                 </tr>
             }
