@@ -6,12 +6,12 @@
 
 @if (this.UserConfigs == null)
 {
-    
+    <MudText Typo="Typo.body2">Loading...</MudText>
 }
-@*else if (this.UserConfigs.Count() == 0)
+else if (this.UserConfigs.Count() == 0)
 {
     <MudText Typo="Typo.body2">No records found.</MudText>
-}*@
+}
 else
 {
     <MudSimpleTable Dense="false" Hover="true" Bordered="false" Striped="false" Style="overflow-x: auto;">

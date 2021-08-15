@@ -19,6 +19,8 @@ namespace StandardFramework.Pages.FeatureFlags
         MudDialogInstance UserConfigModal { get; set; }
         [Parameter]
         public bool UpdateMode { get; set; } = true;
+        [Parameter]
+        public bool IsDisableConfigField { get; set; } = false;
         [Inject]
         public AppDbContext DbContext { get; set; }
         [Inject]

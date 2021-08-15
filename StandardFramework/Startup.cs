@@ -43,7 +43,7 @@ namespace StandardFramework
                 config.SnackbarConfiguration.BackgroundBlurred = true;
                 config.SnackbarConfiguration.HideTransitionDuration = 500;
                 config.SnackbarConfiguration.ShowTransitionDuration = 500;
-                config.SnackbarConfiguration.VisibleStateDuration = 5;
+                config.SnackbarConfiguration.VisibleStateDuration = 10000;
                 config.SnackbarConfiguration.NewestOnTop = true;
                 config.SnackbarConfiguration.ShowCloseIcon = true;
                 config.SnackbarConfiguration.SnackbarVariant = Variant.Filled;

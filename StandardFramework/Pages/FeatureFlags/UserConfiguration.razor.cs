@@ -44,7 +44,8 @@ namespace StandardFramework.Pages.FeatureFlags
         protected void OpenAddNewConfigModal()
         {
             var parameter = new DialogParameters() { ["SelectedConfig"] = null };
-            parameter.Add("UpdateMode", false);
+            parameter.Add("UpdateMode", false);            
+            parameter.Add("IsDisableConfigField", false);
             this.DialogService.Show<AddUserConfiguration>("Add new config", parameter);
             this.UserConfigs = this.DbContext.UserConfigs;
         }
@@ -54,6 +55,7 @@ namespace StandardFramework.Pages.FeatureFlags
             var parameter = new DialogParameters();
             parameter.Add("SelectedConfig", model);
             parameter.Add("UpdateMode", true);
+            parameter.Add("IsDisableConfigField", true);
             this.DialogService.Show<AddUserConfiguration>("Update config", parameter);
             this.UserConfigs = this.DbContext.UserConfigs;
         }
