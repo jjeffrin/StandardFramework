@@ -4,7 +4,9 @@ using StandardFramework.Services;
 using StandardFramework.Utilities.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace StandardFramework.Utilities
@@ -15,6 +17,7 @@ namespace StandardFramework.Utilities
         private readonly ISnackbar snackbarService;
         private readonly IAppState appState;
         private readonly IAppConfig appConfig;
+        private Stopwatch watch;
 
         public enum ActionContextEnum
         {
@@ -34,10 +37,12 @@ namespace StandardFramework.Utilities
             this.appConfig = appConfig;
             this.context = context;
             this.snackbarService = snackbarService;
+            this.watch = new Stopwatch();
         }
 
         public async Task ExecuteActionWithContext(Action<AppDbContext> action, ActionContextEnum actionContext = ActionContextEnum.Generic, bool showFeedback = false)
         {
+            this.watch.Start();
             Exception exceptionInfo = null;
             try
             {
@@ -55,6 +60,7 @@ namespace StandardFramework.Utilities
 
         public async Task ExecuteAction(Action<AppDbContext> action)
         {
+            this.watch.Start();
             //this.appState.ToggleAppLoadState(true);
             Exception exceptionInfo = null;
             try
@@ -104,7 +110,9 @@ namespace StandardFramework.Utilities
             // if (saveNotificationToDb) await this.context.SaveChangesAsync();
             //this.appState.NotifyNotificationStateChanged();
             await this.context.SaveChangesAsync();
-            this.snackbarService.Add("The action is completed. Time of completion: " + DateTime.Now.ToShortTimeString(), Severity.Success);
+            this.watch.Stop();
+            this.snackbarService.Add("(" + DateTime.Now.ToLongTimeString() + ") Action is completed (" + Decimal.Divide(this.watch.ElapsedMilliseconds, 1000) + " secs).", Severity.Success);
+            this.watch.Reset();
             this.appState.SetDbBusy(false);
             this.appState.NotifyAppStateChange();
         }
