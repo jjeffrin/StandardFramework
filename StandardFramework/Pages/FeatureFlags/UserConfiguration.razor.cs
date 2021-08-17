@@ -37,7 +37,6 @@ namespace StandardFramework.Pages.FeatureFlags
             {
                 var recordToDel = dbContext.UserConfigs.FirstOrDefault(x => x.Name == configName);
                 dbContext.UserConfigs.Remove(recordToDel);
-                // await this.DbContext.SaveChangesAsync();
             });
         }
 

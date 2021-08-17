@@ -42,6 +42,7 @@ namespace StandardFramework.Utilities
 
         public async Task ExecuteActionWithContext(Action<AppDbContext> action, ActionContextEnum actionContext = ActionContextEnum.Generic, bool showFeedback = false)
         {
+            this.appState.ToggleAppLoadState(true);
             this.watch.Start();
             Exception exceptionInfo = null;
             try
@@ -114,6 +115,7 @@ namespace StandardFramework.Utilities
             this.snackbarService.Add("(" + DateTime.Now.ToLongTimeString() + ") Action is completed (" + Decimal.Divide(this.watch.ElapsedMilliseconds, 1000) + " secs).", Severity.Success);
             this.watch.Reset();
             this.appState.SetDbBusy(false);
+            this.appState.ToggleAppLoadState(false);
             this.appState.NotifyAppStateChange();
         }
     }

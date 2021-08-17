@@ -19,11 +19,17 @@ namespace StandardFramework.Utilities.PageHelpers
         [Inject]
         public IActionExecutor ActionExecutor { get; set; }
 
-        protected override void OnInitialized()
+        public StandardScreenBase()
         {
-            this.AppState.OnAppStateChange += StateHasChanged;
+            
         }
 
+        protected override void OnInitialized()
+        {
+            this.AppState.ToggleAppLoadState(true);
+            this.AppState.OnAppStateChange += StateHasChanged;
+        }
+        
         protected override bool ShouldRender()
         {
             if (this.AppState.IsDbBusy()) 
@@ -31,6 +37,15 @@ namespace StandardFramework.Utilities.PageHelpers
                 return false;
             }
             return base.ShouldRender();
+        }
+
+        protected override void OnAfterRender(bool firstRender)
+        {
+            if (firstRender)
+            {
+                this.AppState.ToggleAppLoadState(false);
+            }
+            base.OnAfterRender(firstRender);
         }
 
         public void Dispose()
