@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StandardFramework.Services;
 
 namespace StandardFramework.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210817151213_AddNewColsToNotificationModel")]
+    partial class AddNewColsToNotificationModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,35 +74,20 @@ namespace StandardFramework.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ActionInvokeMemberName")
+                    b.Property<string>("Content")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("ActionInvokeTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ActionType")
+                    b.Property<string>("HelpLink")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ExceptionHelpLink")
+                    b.Property<string>("Message")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ExceptionMessage")
+                    b.Property<string>("Source")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ExceptionSource")
+                    b.Property<string>("StackTrace")
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ExceptionStackTrace")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<bool>("IsException")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("SourceFilePath")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("SourceLineNumber")
-                        .HasColumnType("int");
 
                     b.HasKey("Id");
 

@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -40,10 +41,45 @@ namespace StandardFramework.Utilities
             this.watch = new Stopwatch();
         }
 
-        public async Task ExecuteActionWithContext(Action<AppDbContext> action, ActionContextEnum actionContext = ActionContextEnum.Generic, bool showFeedback = false)
+        //public async Task ExecuteActionWithContext(Action<AppDbContext> action, ActionContextEnum actionContext = ActionContextEnum.Generic, bool showFeedback = false)
+        //{
+        //    this.appState.ToggleAppLoadState(true);
+        //    this.watch.Start();
+        //    Exception exceptionInfo = null;
+        //    try
+        //    {
+        //        action?.Invoke(this.context);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        exceptionInfo = ex;
+        //    }
+        //    finally
+        //    {
+        //        await this.ProcessExecutionResult(exceptionInfo);
+        //    }
+        //}
+
+        public class ActionInfo
         {
-            this.appState.ToggleAppLoadState(true);
+            public ActionInfo(string actionInvokeMemberName, string sourceFilePath, int sourceLineNumber)
+            {
+                this.ActionInvokeTime = DateTime.Now;
+                this.ActionInvokeMemberName = actionInvokeMemberName;
+                this.SourceFilePath = sourceFilePath;
+                this.SourceLineNumber = sourceLineNumber;
+            }
+
+            public DateTime ActionInvokeTime { get; set; }
+            public string ActionInvokeMemberName { get; set; }
+            public string SourceFilePath { get; set; }
+            public int SourceLineNumber { get; set; }
+        }
+
+        public async Task ExecuteAction(Action<AppDbContext> action, [CallerMemberName]string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
+        {
             this.watch.Start();
+            var actionInfo = new ActionInfo(memberName, sourceFilePath, sourceLineNumber);
             Exception exceptionInfo = null;
             try
             {
@@ -55,31 +91,29 @@ namespace StandardFramework.Utilities
             }
             finally
             {
-                await this.ProcessExecutionResult(exceptionInfo);
+                await this.ProcessExecutionResult(exceptionInfo, actionInfo);
             }
         }
 
-        public async Task ExecuteAction(Action<AppDbContext> action)
+        private NotificationModel CreateNotificationObject(Exception exceptionInfo, ActionInfo actionInfo)
         {
-            this.watch.Start();
-            //this.appState.ToggleAppLoadState(true);
-            Exception exceptionInfo = null;
-            try
+            var obj = new NotificationModel();
+            if (exceptionInfo != null)
             {
-                action?.Invoke(this.context);
+                obj.IsException = true;
+                obj.ExceptionMessage = exceptionInfo.Message;
+                obj.ExceptionSource = exceptionInfo.Source;
+                obj.ExceptionStackTrace = exceptionInfo.StackTrace;
+                obj.ExceptionHelpLink = exceptionInfo.HelpLink;
             }
-            catch (Exception ex)
-            {
-                exceptionInfo = ex;
-            }
-            finally
-            {
-                await this.ProcessExecutionResult(exceptionInfo);
-            }
-            //this.appState.ToggleAppLoadState(false);
+            obj.ActionInvokeMemberName = actionInfo.ActionInvokeMemberName;
+            obj.ActionInvokeTime = actionInfo.ActionInvokeTime;
+            obj.SourceFilePath = actionInfo.SourceFilePath;
+            obj.SourceLineNumber = actionInfo.SourceLineNumber;
+            return obj;
         }
 
-        private async Task ProcessExecutionResult(Exception exceptionInfo)
+        private async Task ProcessExecutionResult(Exception exceptionInfo, ActionInfo actionInfo)
         {
             bool saveNotificationToDb = this.appConfig.GetConfigValue(Constants.AppConfigSettings.TRACK_NOTIFICATIONS_IN_DB);
             if (exceptionInfo != null)
@@ -87,11 +121,11 @@ namespace StandardFramework.Utilities
                 // add fail message
                 if (saveNotificationToDb)
                 {
-                    await this.context.Notifications.AddAsync(new NotificationModel() { Content = "Failed" });
+                    await this.context.Notifications.AddAsync(CreateNotificationObject(exceptionInfo, actionInfo));
                 }
                 else
                 {
-                    this.appState.LocalNotifications.Append(new NotificationModel() { Content = "Local Failed" });
+                    // this.appState.LocalNotifications.Append(new NotificationModel() { Content = "Local Failed" });
                 }
             }
             else
@@ -99,11 +133,11 @@ namespace StandardFramework.Utilities
                 // add success message
                 if (saveNotificationToDb)
                 {
-                    await this.context.Notifications.AddAsync(new NotificationModel() { Content = "Success" });
+                    await this.context.Notifications.AddAsync(CreateNotificationObject(exceptionInfo, actionInfo));
                 }
                 else
                 {
-                    this.appState.LocalNotifications.Append(new NotificationModel() { Content = "Local Success" });
+                    // this.appState.LocalNotifications.Append(new NotificationModel() { Content = "Local Success" });
                 }
             }
 
@@ -112,7 +146,14 @@ namespace StandardFramework.Utilities
             //this.appState.NotifyNotificationStateChanged();
             await this.context.SaveChangesAsync();
             this.watch.Stop();
-            this.snackbarService.Add("(" + DateTime.Now.ToLongTimeString() + ") Action is completed (" + Decimal.Divide(this.watch.ElapsedMilliseconds, 1000) + " secs).", Severity.Success);
+            if (exceptionInfo != null)
+            {
+                this.snackbarService.Add("(" + DateTime.Now.ToLongTimeString() + ") Error: " + exceptionInfo.Message + "(" + Decimal.Divide(this.watch.ElapsedMilliseconds, 1000) + " secs).", Severity.Error);
+            }
+            else
+            {
+                this.snackbarService.Add("(" + DateTime.Now.ToLongTimeString() + ") Action is completed (" + Decimal.Divide(this.watch.ElapsedMilliseconds, 1000) + " secs).", Severity.Success);
+            }
             this.watch.Reset();
             this.appState.SetDbBusy(false);
             this.appState.ToggleAppLoadState(false);

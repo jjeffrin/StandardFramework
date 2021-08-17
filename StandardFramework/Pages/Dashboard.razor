@@ -1,5 +1,7 @@
 ﻿@page "/dashboard"
+@inherits StandardScreenBase
 
 <MudText Typo="Typo.h3">Dashboard</MudText>
 
 <MudButton Color="Color.Primary" Size="Size.Small" OnClick="ChangeLoadState">Load app</MudButton>
+<MudButton Color="Color.Primary" Size="Size.Small" OnClick="ThrowError">Throw error</MudButton>

@@ -15,6 +15,15 @@ namespace StandardFramework.Models
 
         [Key]
         public Guid Id { get; set; }
-        public string Content { get; set; }
+        public string ExceptionSource { get; set; }
+        public string ExceptionMessage { get; set; }
+        public string ExceptionStackTrace { get; set; }
+        public string ExceptionHelpLink { get; set; }
+        public DateTime ActionInvokeTime { get; set; }
+        public string ActionInvokeMemberName { get; set; }
+        public string SourceFilePath { get; set; }
+        public int SourceLineNumber { get; set; }
+        public string ActionType { get; set; }
+        public bool IsException { get; set; }
     }
 }
