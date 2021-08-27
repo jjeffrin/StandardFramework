@@ -41,7 +41,7 @@ namespace StandardFramework.Utilities.PageHelpers
 
         protected override void OnAfterRender(bool firstRender)
         {
-            if (firstRender || this.AppState.IsAppLoading())
+            if (firstRender)
             {
                 this.AppState.ToggleAppLoadState(false);
             }

@@ -56,8 +56,11 @@
 
     protected void NavigateToPage(string link)
     {
-        this.AppState.ToggleAppLoadState(true);
-        this.NavigationManager.NavigateTo(link);
+        if (this.NavigationManager.Uri.Replace(this.NavigationManager.BaseUri, "/") != link)
+        {
+            this.AppState.ToggleAppLoadState(true);
+            this.NavigationManager.NavigateTo(link);
+        }
     }
 
     public void Dispose()
