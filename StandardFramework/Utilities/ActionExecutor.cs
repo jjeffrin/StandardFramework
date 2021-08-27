@@ -19,6 +19,7 @@ namespace StandardFramework.Utilities
         private readonly IAppState appState;
         private readonly IAppConfig appConfig;
         private Stopwatch watch;
+        private Guid lastAddedNotifId;
 
         public enum ActionContextEnum
         {
@@ -78,6 +79,7 @@ namespace StandardFramework.Utilities
 
         public async Task ExecuteAction(Action<AppDbContext> action, [CallerMemberName]string memberName = "", [CallerFilePath] string sourceFilePath = "", [CallerLineNumber] int sourceLineNumber = 0)
         {
+            this.appState.ToggleAppLoadState(true);
             this.watch.Start();
             var actionInfo = new ActionInfo(memberName, sourceFilePath, sourceLineNumber);
             Exception exceptionInfo = null;
@@ -98,6 +100,7 @@ namespace StandardFramework.Utilities
         private NotificationModel CreateNotificationObject(Exception exceptionInfo, ActionInfo actionInfo)
         {
             var obj = new NotificationModel();
+            this.lastAddedNotifId = obj.Id;
             if (exceptionInfo != null)
             {
                 obj.IsException = true;
@@ -110,42 +113,25 @@ namespace StandardFramework.Utilities
             obj.ActionInvokeTime = actionInfo.ActionInvokeTime;
             obj.SourceFilePath = actionInfo.SourceFilePath;
             obj.SourceLineNumber = actionInfo.SourceLineNumber;
+            obj.UpdateDate = DateTime.Now;
+            obj.UpdatedUser = "DEV";
             return obj;
         }
 
         private async Task ProcessExecutionResult(Exception exceptionInfo, ActionInfo actionInfo)
         {
+            // 1. Get the config value to see if logs are to be tracked in DB
             bool saveNotificationToDb = this.appConfig.GetConfigValue(Constants.AppConfigSettings.TRACK_NOTIFICATIONS_IN_DB);
-            if (exceptionInfo != null)
+            // 2. Check if the config is true. If true, then save off the log to DB
+            if (saveNotificationToDb)
             {
-                // add fail message
-                if (saveNotificationToDb)
-                {
-                    await this.context.Notifications.AddAsync(CreateNotificationObject(exceptionInfo, actionInfo));
-                }
-                else
-                {
-                    // this.appState.LocalNotifications.Append(new NotificationModel() { Content = "Local Failed" });
-                }
+                await this.context.Notifications.AddAsync(CreateNotificationObject(exceptionInfo, actionInfo));
+                this.appState.SetDbBusy(true);
+                await this.context.SaveChangesAsync();
             }
-            else
-            {
-                // add success message
-                if (saveNotificationToDb)
-                {
-                    await this.context.Notifications.AddAsync(CreateNotificationObject(exceptionInfo, actionInfo));
-                }
-                else
-                {
-                    // this.appState.LocalNotifications.Append(new NotificationModel() { Content = "Local Success" });
-                }
-            }
-
-            this.appState.SetDbBusy(true);
-            // if (saveNotificationToDb) await this.context.SaveChangesAsync();
-            //this.appState.NotifyNotificationStateChanged();
-            await this.context.SaveChangesAsync();
+            // 3. Stop the watch because all trackable actions are done!
             this.watch.Stop();
+            // 4. Show a snackbar to the user, indicating the result of the action
             if (exceptionInfo != null)
             {
                 this.snackbarService.Add("(" + DateTime.Now.ToLongTimeString() + ") Error: " + exceptionInfo.Message + "(" + Decimal.Divide(this.watch.ElapsedMilliseconds, 1000) + " secs).", Severity.Error);
@@ -154,7 +140,19 @@ namespace StandardFramework.Utilities
             {
                 this.snackbarService.Add("(" + DateTime.Now.ToLongTimeString() + ") Action is completed (" + Decimal.Divide(this.watch.ElapsedMilliseconds, 1000) + " secs).", Severity.Success);
             }
+            // 5. Query log record thats just been saved off to DB
+            var lastAddedNotifRecord = this.context.Notifications.Single(x => x.Id == this.lastAddedNotifId);
+            // 6. Update the log record with ElapsedTime
+            if (lastAddedNotifRecord != null)
+            {
+                lastAddedNotifRecord.ElapsedTime = Decimal.Divide(this.watch.ElapsedMilliseconds, 1000);
+                this.context.Notifications.Update(lastAddedNotifRecord);
+            }
+            // 7. Again save off the log updates to DB
+            await this.context.SaveChangesAsync();
+            // 8. Reset the watch and get ready for the next action!
             this.watch.Reset();
+            // 9. Also, since all DB activities are done for the currect action, set the DbBusy flag to false
             this.appState.SetDbBusy(false);
             this.appState.ToggleAppLoadState(false);
             this.appState.NotifyAppStateChange();

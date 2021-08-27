@@ -1,4 +1,5 @@
-﻿using System;
+﻿using StandardFramework.Models.Base;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace StandardFramework.Models
 {
-    public class NotificationModel
+    public class NotificationModel : UserTrackable
     {
         public NotificationModel()
         {
@@ -25,5 +26,6 @@ namespace StandardFramework.Models
         public int SourceLineNumber { get; set; }
         public string ActionType { get; set; }
         public bool IsException { get; set; }
+        public decimal ElapsedTime { get; set; }
     }
 }

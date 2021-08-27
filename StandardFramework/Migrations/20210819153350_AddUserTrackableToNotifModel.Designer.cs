@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using StandardFramework.Services;
 
 namespace StandardFramework.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20210819153350_AddUserTrackableToNotifModel")]
+    partial class AddUserTrackableToNotifModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -83,9 +85,6 @@ namespace StandardFramework.Migrations
 
                     b.Property<DateTime>("CreateDate")
                         .HasColumnType("datetime2");
-
-                    b.Property<decimal>("ElapsedTime")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<string>("ExceptionHelpLink")
                         .HasColumnType("nvarchar(max)");

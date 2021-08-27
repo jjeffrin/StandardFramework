@@ -32,7 +32,7 @@ namespace StandardFramework.Utilities.PageHelpers
         
         protected override bool ShouldRender()
         {
-            if (this.AppState.IsDbBusy()) 
+            if (this.AppState.IsDbBusy() || this.AppState.IsAppLoading()) 
             {
                 return false;
             }
