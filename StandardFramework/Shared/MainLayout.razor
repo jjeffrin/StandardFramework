@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
-@inject IAppState AppState 
+@inject IAppState AppState
+@inject NavigationManager NavigationManager
 @implements IDisposable
 
 <MudLayout>
@@ -22,7 +23,7 @@
                 <MudNavLink Href="/dashboard">Dashboard</MudNavLink>
                 <MudNavLink Href="/metrics">Metrics</MudNavLink>
                 <MudNavGroup Title="Feature Flags" Expanded="false">
-                    <MudNavLink Href="/featureFlags/UserConfiguration">User Configuration</MudNavLink>
+                    <MudNavLink @onclick="@(e => NavigateToPage("/featureFlags/UserConfiguration"))">User Configuration</MudNavLink>
                     <MudNavLink Href="/featureFlags/GlobalConfiguration">Global Configuration</MudNavLink>
                 </MudNavGroup>
                 <MudNavLink Href="/about">About</MudNavLink>
@@ -53,9 +54,15 @@
         AppState.OnAppStateChange += StateHasChanged;
     }
 
+    protected void NavigateToPage(string link)
+    {
+        this.AppState.ToggleAppLoadState(true);
+        this.NavigationManager.NavigateTo(link);
+    }
+
     public void Dispose()
     {
         AppState.OnAppStateChange -= StateHasChanged;
     }
 
-} 
+}

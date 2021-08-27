@@ -23,5 +23,12 @@ namespace StandardFramework.Services
         public DbSet<ScreenMetricModel> ScreenMetrics { get; set; }
 
         #endregion
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<NotificationModel>().Property(x => x.ElapsedTime).HasColumnType("decimal(5,2)");
+
+            base.OnModelCreating(modelBuilder);
+        }
     }
 }
