@@ -1,2 +1,2 @@
 # StandardFramework
-Exploring C#, Blazor and a lot along the way by creating this minimal framework. 
+Exploring C#, Blazor and a lot along the way by creating this minimal framework. I wouldn't call this a complete framework, but maybe called as a boilerplate which provides some of the basic functionalities, that every software product will use. This framework/boilerplate uses, Entity Framework to communicate with a DB and Mudblazor (based on Material Design) as the choice of frontend through Blazor Server Side architecture. 
