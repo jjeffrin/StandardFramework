@@ -1,5 +1,7 @@
-﻿using MudBlazor;
+﻿using Microsoft.EntityFrameworkCore;
+using MudBlazor;
 using StandardFramework.Models;
+using StandardFramework.Models.Base;
 using StandardFramework.Services;
 using StandardFramework.Utilities.Interfaces;
 using System;
@@ -125,10 +127,12 @@ namespace StandardFramework.Utilities
             // 2. Check if the config is true. If true, then save off the log to DB
             if (saveNotificationToDb)
             {
-                await this.context.Notifications.AddAsync(CreateNotificationObject(exceptionInfo, actionInfo));
-                this.appState.SetDbBusy(true);
-                await this.context.SaveChangesAsync();
+                await this.context.Notifications.AddAsync(CreateNotificationObject(exceptionInfo, actionInfo));                
             }
+            // 2A. Check and set values to the trackable objects
+            this.SetValuesToTrackableObjects();
+            this.appState.SetDbBusy(true);
+            await this.context.SaveChangesAsync();
             // 3. Stop the watch because all trackable actions are done!
             this.watch.Stop();
             // 4. Show a snackbar to the user, indicating the result of the action
@@ -138,24 +142,70 @@ namespace StandardFramework.Utilities
             }
             else
             {
-                this.snackbarService.Add("(" + DateTime.Now.ToLongTimeString() + ") Action is completed (" + Decimal.Divide(this.watch.ElapsedMilliseconds, 1000) + " secs).", Severity.Success);
+                this.snackbarService.Add("(" + DateTime.Now.ToString("hh:mm:ss tt") + ") Action is completed (" + Decimal.Divide(this.watch.ElapsedMilliseconds, 1000) + " secs).", Severity.Success);
             }
-            // 5. Query log record thats just been saved off to DB
-            var lastAddedNotifRecord = this.context.Notifications.Single(x => x.Id == this.lastAddedNotifId);
-            // 6. Update the log record with ElapsedTime
-            if (lastAddedNotifRecord != null)
+            if (saveNotificationToDb)
             {
-                lastAddedNotifRecord.ElapsedTime = Decimal.Divide(this.watch.ElapsedMilliseconds, 1000);
-                this.context.Notifications.Update(lastAddedNotifRecord);
+                // 5. Query log record thats just been saved off to DB
+                var lastAddedNotifRecord = this.context.Notifications.Single(x => x.Id == this.lastAddedNotifId);
+                // 6. Update the log record with ElapsedTime
+                if (lastAddedNotifRecord != null)
+                {
+                    lastAddedNotifRecord.ElapsedTime = Decimal.Divide(this.watch.ElapsedMilliseconds, 1000);
+                    this.context.Notifications.Update(lastAddedNotifRecord);
+
+                    // 7. Again save off the log updates to DB
+                    await this.context.SaveChangesAsync();
+                }
             }
-            // 7. Again save off the log updates to DB
-            await this.context.SaveChangesAsync();
             // 8. Reset the watch and get ready for the next action!
             this.watch.Reset();
             // 9. Also, since all DB activities are done for the currect action, set the DbBusy flag to false
             this.appState.SetDbBusy(false);
             this.appState.ToggleAppLoadState(false);
             this.appState.NotifyAppStateChange();
+        }
+
+        private void SetValuesToTrackableObjects()
+        {
+            foreach (var item in this.context.ChangeTracker.Entries())
+            {
+                UserTrackable userTrackable = null;
+                Trackable trackable = null;
+                if (item.Entity.GetType().BaseType == typeof(UserTrackable))
+                {
+                    userTrackable = (UserTrackable)item.Entity;
+                }
+                else if (item.Entity.GetType().BaseType == typeof(Trackable))
+                {
+                    trackable = (Trackable)item.Entity;
+                }
+                if (trackable != null)
+                {
+                    if (item.State == EntityState.Added)
+                    {
+                        trackable.CreateDate = DateTime.Now;
+                        trackable.UpdateDate = DateTime.Now;
+                    }
+                    else if (item.State == EntityState.Modified)
+                    {
+                        trackable.UpdateDate = DateTime.Now;
+                    }
+                }
+                if (userTrackable != null)
+                {
+                    if (item.State == EntityState.Added)
+                    {
+                        userTrackable.CreateDate = DateTime.Now;
+                        userTrackable.UpdateDate = DateTime.Now;
+                        userTrackable.UpdatedUser = "DEV";
+                    }
+                    else if (item.State == EntityState.Modified)
+                    {
+                        userTrackable.UpdateDate = DateTime.Now;
+                    }
+                }
+            }
         }
     }
 }

@@ -7,6 +7,6 @@ namespace StandardFramework.Utilities.Interfaces
 {
     public interface IAppConfig
     {
-        bool GetConfigValue(string config);
+        bool GetConfigValue(string config, bool refreshCache = true);
     }
 }
