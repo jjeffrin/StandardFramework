@@ -11,14 +11,7 @@ using System.Threading.Tasks;
 namespace StandardFramework.Pages.FeatureFlags
 {
     public partial class UserConfiguration : StandardScreenBase
-    {
-        #region Dependencies
-
-        [Inject]
-        public AppDbContext DbContext { get; set; }
-
-        #endregion
-
+    { 
         #region Members
 
         public IEnumerable<UserConfigModel> UserConfigs { get; set; } = Enumerable.Empty<UserConfigModel>();

@@ -1,0 +1,73 @@
+﻿@inherits StandardScreenBase
+@page "/Logs"
+
+<MudText Typo="Typo.h6">Logs</MudText>
+<MudGrid Class="py-2">
+    <MudItem xs="3">
+        <MudCheckBox @bind-Checked="@ShowErrors" Label="Show errors"></MudCheckBox>
+    </MudItem>   
+    <MudItem xs="3">
+        <MudCheckBox @bind-Checked="@ShowSlowProcesses" Label="Show slow processes"></MudCheckBox>
+    </MudItem>
+    <MudItem xs="3">
+        <MudDatePicker Label="Logs From" @bind-Date="LogsFromDate" DisableToolbar="true" HelperText="From Date"/>
+    </MudItem>
+    <MudItem xs="3">
+        <MudDatePicker Label="Logs To" @bind-Date="LogsToDate" DisableToolbar="true" HelperText="From To" />
+    </MudItem>
+</MudGrid>
+
+<MudDivider />
+
+@foreach (var notif in this.GetAllNotificationsBasedOnFilter())
+{
+    <MudExpansionPanel HideIcon="false">
+        <TitleContent>
+            <div class="d-flex">
+                <MudText Class="mt-1">@notif.UpdateDate | @notif.ActionInvokeMemberName</MudText>
+                <MudChip Class="order-md-last" Disabled="true" Text="@GetPillContent(notif.IsException)" Color="GetBadgeColor(notif.ElapsedTime, notif.IsException)"></MudChip>
+                <MudBadge Content="@notif.ElapsedTime.ToString()" Color="GetBadgeColor(notif.ElapsedTime, notif.IsException)" Overlap="true" Class="d-flex ml-auto">
+                    @if (notif.IsException)
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Error" Color="Color.Error" />
+                    }
+                    else
+                    {
+                        <MudIcon Icon="@Icons.Material.Filled.Check" Color="Color.Success" />
+                    }
+                </MudBadge>
+            </div>
+        </TitleContent>
+        <ChildContent>
+            <MudGrid>
+            @if (notif.IsException)
+            {
+                <MudItem xs="12">     
+                    <MudText Typo="Typo.h6">Exception Info:</MudText>
+                    <MudDivider />
+                    <MudText Class="mt-1"><b>Exception Message:</b> @notif.ExceptionMessage</MudText>
+                    <MudText Class="mt-1"><b>Exception Source:</b> @notif.ExceptionSource</MudText>
+                    <MudText Class="mt-1"><b>Exception Stack Trace:</b> @notif.ExceptionStackTrace</MudText>
+                    <MudText Class="mt-1"><b>Exception Help Link:</b> @notif.ExceptionHelpLink</MudText>
+                </MudItem>
+            }
+                <MudItem xs="6">     
+                    <MudText Typo="Typo.h6">Action Invoker Info:</MudText>
+                    <MudDivider />
+                    <MudText Class="mt-1"><b>Action Invoker:</b> @notif.ActionInvokeMemberName</MudText>
+                    <MudText Class="mt-1"><b>Action Invoke Time:</b> @notif.ActionInvokeTime</MudText>
+                    <MudText Class="mt-1"><b>Action Type:</b> @notif.ActionType</MudText>
+                    <MudText Class="mt-1" Color="GetElapsedTimeColor(notif.ElapsedTime)"><b>Action elapsed for:</b> @notif.ElapsedTime seconds</MudText>
+                </MudItem>
+                <MudItem xs="6">     
+                    <MudText Typo="Typo.h6">Source Info: </MudText>
+                    <MudDivider />                    
+                    <MudText Class="mt-1"><b>Src Line Number:</b> @notif.SourceLineNumber</MudText>
+                    <MudText Class="mt-1"><b>Src File Path:</b> @notif.SourceFilePath</MudText>
+                    <MudText Class="mt-1"><b>Username:</b> @notif.UpdatedUser</MudText>
+                    <MudText Class="mt-1"><b>Logged at:</b> @notif.UpdateDate</MudText>
+                </MudItem>
+            </MudGrid>
+        </ChildContent>
+    </MudExpansionPanel>
+}

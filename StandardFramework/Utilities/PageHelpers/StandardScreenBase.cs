@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Components;
 using MudBlazor;
+using StandardFramework.Services;
 using StandardFramework.Utilities.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -18,6 +19,8 @@ namespace StandardFramework.Utilities.PageHelpers
         public IDialogService DialogService { get; set; }
         [Inject]
         public IActionExecutor ActionExecutor { get; set; }
+        [Inject]
+        public AppDbContext DbContext { get; set; }
 
         public StandardScreenBase()
         {
